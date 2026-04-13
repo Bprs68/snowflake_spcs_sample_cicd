@@ -32,7 +32,7 @@ jobs:
 
       - name: Tag Image
         run: |
-          docker tag app:latest ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/MY_DB/PUBLIC/MY_REPO/app:latest
+          docker tag app:latest ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/DEMO_DB/PUBLIC/MY_REPO/app:latest
 
       - name: Push Image
         run: |
@@ -46,4 +46,4 @@ jobs:
             -a ${{ secrets.SNOWFLAKE_ACCOUNT }} \
             -u ${{ secrets.SNOWFLAKE_USER }} \
             -r ${{ secrets.SNOWFLAKE_ROLE }} \
-            -q "ALTER SERVICE my_service SET IMAGE='${{ secrets.SNOWFLAKE_REGISTRY_URL }}/MY_DB/PUBLIC/MY_REPO/app:latest';"
+            -q "ALTER SERVICE my_service SET IMAGE='${{ secrets.SNOWFLAKE_REGISTRY_URL }}/DEMO_DB/PUBLIC/MY_REPO/app:latest';"
