@@ -2,42 +2,48 @@ name: Deploy to Snowflake
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Install SnowSQL
-      run: |
-        curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.32-linux_x86_64.bash
-        bash snowsql-1.2.32-linux_x86_64.bash
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-    - name: Login to Snowflake Container Registry
-      run: |
-        echo "${{ secrets.SNOWFLAKE_PASSWORD }}" | docker login ${{ secrets.SNOWFLAKE_REGISTRY_URL }} \
-        -u "${{ secrets.SNOWFLAKE_USER }}" --password-stdin
+      - name: Install Snowflake CLI
+        run: |
+          pip install snowflake-cli-labs
 
-    - name: Build Docker Image
-      run: |
-        docker build -t app:latest .
+      - name: Login to Snowflake Container Registry
+        run: |
+          echo "${{ secrets.SNOWFLAKE_PASSWORD }}" | docker login ${{ secrets.SNOWFLAKE_REGISTRY_URL }} \
+          -u "${{ secrets.SNOWFLAKE_USER }}" --password-stdin
 
-    - name: Tag Image
-      run: |
-        docker tag app:latest ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/my_repo/app:latest
+      - name: Build Docker Image
+        run: |
+          docker build -t app:latest .
 
-    - name: Push Image
-      run: |
-        docker push ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/my_repo/app:latest
+      - name: Tag Image
+        run: |
+          docker tag app:latest ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/MY_DB/PUBLIC/MY_REPO/app:latest
 
-    - name: Deploy to Snowflake Service
-      run: |
-        snowsql -a ${{ secrets.SNOWFLAKE_ACCOUNT }} \
-        -u ${{ secrets.SNOWFLAKE_USER }} \
-        -p ${{ secrets.SNOWFLAKE_PASSWORD }} \
-        -r ${{ secrets.SNOWFLAKE_ROLE }} \
-        -q "ALTER SERVICE my_service SET IMAGE='${{ secrets.SNOWFLAKE_REGISTRY_URL }}/my_repo/app:latest';"
+      - name: Push Image
+        run: |
+          docker push ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/DEMO_DB/PUBLIC/MY_REPO/app:latest
+
+      - name: Deploy to Snowflake Service
+        env:
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        run: |
+          snow sql \
+            -a ${{ secrets.SNOWFLAKE_ACCOUNT }} \
+            -u ${{ secrets.SNOWFLAKE_USER }} \
+            -r ${{ secrets.SNOWFLAKE_ROLE }} \
+            -q "ALTER SERVICE my_service SET IMAGE='${{ secrets.SNOWFLAKE_REGISTRY_URL }}/MY_DB/PUBLIC/MY_REPO/app:latest';"
