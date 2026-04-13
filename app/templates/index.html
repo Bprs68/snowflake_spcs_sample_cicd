@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snowflake App</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>🚀 Snowflake Container App</h1>
+    
+    <button onclick="fetchData()">Call API</button>
+    
+    <p id="result"></p>
+
+    <script>
+        async function fetchData() {
+            const res = await fetch('/api/hello');
+            const data = await res.json();
+            document.getElementById('result').innerText = data.message;
+        }
+    </script>
+</body>
+</html>
