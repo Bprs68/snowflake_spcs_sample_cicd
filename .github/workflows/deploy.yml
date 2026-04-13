@@ -32,11 +32,11 @@ jobs:
 
       - name: Tag Image
         run: |
-          docker tag app:latest ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/DEMO_DB/PUBLIC/MY_REPO/app:latest
+          docker tag app:latest ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/demo_db/public/my_repo/app:latest
 
       - name: Push Image
         run: |
-          docker push ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/DEMO_DB/PUBLIC/MY_REPO/app:latest
+          docker push ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/demo_db/public/my_repo/app:latest
 
       - name: Deploy to Snowflake Service
         env:
@@ -46,4 +46,4 @@ jobs:
             -a ${{ secrets.SNOWFLAKE_ACCOUNT }} \
             -u ${{ secrets.SNOWFLAKE_USER }} \
             -r ${{ secrets.SNOWFLAKE_ROLE }} \
-            -q "ALTER SERVICE my_service SET IMAGE='${{ secrets.SNOWFLAKE_REGISTRY_URL }}/DEMO_DB/PUBLIC/MY_REPO/app:latest';"
+            -q "ALTER SERVICE my_service SET IMAGE='${{ secrets.SNOWFLAKE_REGISTRY_URL }}/demo_db/public/my_repo/app:latest';"
