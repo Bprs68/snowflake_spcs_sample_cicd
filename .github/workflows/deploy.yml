@@ -39,10 +39,17 @@ jobs:
           docker push ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/demo_db/public/my_repo/app:latest
 
       - name: Deploy to Snowflake Service
+        run: |
+          snow sql \
+            --temporary-connection \
+            --account $SNOWFLAKE_ACCOUNT \
+            --user $SNOWFLAKE_USER \
+            --password $SNOWFLAKE_PASSWORD \
+            --role $SNOWFLAKE_ROLE \
+            --query "ALTER SERVICE my_service SET IMAGE='${SNOWFLAKE_REGISTRY_URL}/DEMO_DB/PUBLIC/MY_REPO/app:latest';"
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
           SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
-        run: |
-          snow sql -q "ALTER SERVICE my_service SET IMAGE='${{ secrets.SNOWFLAKE_REGISTRY_URL }}/demo_db/public/my_repo/app:latest';"
+          SNOWFLAKE_REGISTRY_URL: ${{ secrets.SNOWFLAKE_REGISTRY_URL }}
