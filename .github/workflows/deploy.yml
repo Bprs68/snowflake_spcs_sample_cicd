@@ -40,22 +40,21 @@ jobs:
 
       - name: Generate deploy SQL
         run: |
-          cat > deploy.sql << 'EOF'
-          CREATE OR REPLACE SERVICE demo_db.public.my_service
-            INTEGRATION = my_integration
-            SPECIFICATION = $$
-            spec:
-              containers:
-                - name: app
-                  image: ${SNOWFLAKE_REGISTRY_URL}/demo_db/public/my_repo/app:latest
-              endpoints:
-                - name: app
-                  port: 8080
-            $$;
+          cat > deploy.sql << EOF
+          DROP SERVICE IF EXISTS demo_db.public.my_service;
+          CREATE SERVICE demo_db.public.my_service
+            IN COMPUTE POOL my_pool
+            FROM SPECIFICATION \$\$
+          spec:
+            containers:
+              - name: app
+                image: /demo_db/public/my_repo/app:latest
+            endpoints:
+              - name: app
+                port: 8080
+                public: true
+          \$\$;
           EOF
-        env:
-          SNOWFLAKE_REGISTRY_URL: ${{ secrets.SNOWFLAKE_REGISTRY_URL }}
-
 
       - name: Deploy Snowflake Service
         run: |
@@ -63,6 +62,7 @@ jobs:
             --temporary-connection \
             --account $SNOWFLAKE_ACCOUNT \
             --user $SNOWFLAKE_USER \
+            --password $SNOWFLAKE_PASSWORD \
             --role $SNOWFLAKE_ROLE \
             -f deploy.sql
         env:
@@ -70,3 +70,4 @@ jobs:
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
           SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+
