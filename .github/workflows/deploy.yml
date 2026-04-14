@@ -46,7 +46,7 @@ jobs:
             --user $SNOWFLAKE_USER \
             --password $SNOWFLAKE_PASSWORD \
             --role $SNOWFLAKE_ROLE \
-            --query "ALTER SERVICE my_service SET IMAGE='${SNOWFLAKE_REGISTRY_URL}/demo_db/public/my_db/app:latest';"
+            --query "ALTER SERVICE my_service SET IMAGE='${SNOWFLAKE_REGISTRY_URL}/demo_db/public/my_repo/app:latest';"
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
