@@ -47,8 +47,7 @@ jobs:
             --account $SNOWFLAKE_ACCOUNT \
             --user $SNOWFLAKE_USER \
             --role $SNOWFLAKE_ROLE \
-            --query "ALTER SERVICE my_service FROM SPECIFICATION_FILE='rendered_service.yaml';"
-        env:
+            --query "ALTER SERVICE demo_db.public.my_service FROM SPECIFICATION_FILE='rendered_service.yaml';"        env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
