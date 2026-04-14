@@ -38,20 +38,24 @@ jobs:
         run: |
           docker push ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/demo_db/public/my_repo/app:latest
 
-      - name: Prepare Snowflake SQL
-        run: |
-          echo "ALTER SERVICE demo_db.public.my_service FROM SPECIFICATION_FILE='rendered_service.yaml';" > deploy.sql
-          
-      - name: Deploy to Snowflake Service
+      - name: Deploy Snowflake Service
         run: |
           snow sql \
             --temporary-connection \
             --account $SNOWFLAKE_ACCOUNT \
             --user $SNOWFLAKE_USER \
             --role $SNOWFLAKE_ROLE \
-            -f deploy.sql
+            --query "ALTER SERVICE demo_db.public.my_service SET SPECIFICATION = $$spec:
+              containers:
+                - name: app
+                  image: ${SNOWFLAKE_REGISTRY_URL}/demo_db/public/my_repo/app:latest
+              endpoints:
+                - name: app
+                  port: 8080
+            $$;"
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
           SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_REGISTRY_URL: ${{ secrets.SNOWFLAKE_REGISTRY_URL }}
