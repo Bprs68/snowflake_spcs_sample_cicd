@@ -1,0 +1,7 @@
+spec:
+  containers:
+    - name: app
+      image: ${SNOWFLAKE_REGISTRY_URL}/demo_db/public/my_repo/app:latest
+  endpoints:
+    - name: app
+      port: 8080
