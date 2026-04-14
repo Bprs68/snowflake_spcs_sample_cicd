@@ -46,10 +46,10 @@ jobs:
             --user $SNOWFLAKE_USER \
             --password $SNOWFLAKE_PASSWORD \
             --role $SNOWFLAKE_ROLE \
-            --query "ALTER SERVICE my_service SET IMAGE='${SNOWFLAKE_REGISTRY_URL}/demo_db/public/my_repo/app:latest';"
+            --query "ALTER SERVICE my_service SET SPECIFICATION = $$spec:\n  containers:\n    - name: app\n      image: ${SNOWFLAKE_REGISTRY_URL}/DEMO_DB/PUBLIC/MY_REPO/app:latest\n  endpoints:\n    - name: app\n      port: 8080\n$$;"
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
           SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
-          SNOWFLAKE_REGISTRY_URL: ${{ secrets.SNOWFLAKE_REGISTRY_URL }}
+    SNOWFLAKE_REGISTRY_URL: ${{ secrets.SNOWFLAKE_REGISTRY_URL }}
