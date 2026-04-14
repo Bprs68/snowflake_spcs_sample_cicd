@@ -38,6 +38,22 @@ jobs:
         run: |
           docker push ${{ secrets.SNOWFLAKE_REGISTRY_URL }}/demo_db/public/my_repo/app:latest
 
+      - name: Generate deploy SQL
+        run: |
+          cat > deploy.sql << 'EOF'
+          ALTER SERVICE demo_db.public.my_service SET SPECIFICATION = $$
+          spec:
+            containers:
+              - name: app
+                image: ${SNOWFLAKE_REGISTRY_URL}/demo_db/public/my_repo/app:latest
+            endpoints:
+              - name: app
+                port: 8080
+          $$;
+          EOF
+        env:
+          SNOWFLAKE_REGISTRY_URL: ${{ secrets.SNOWFLAKE_REGISTRY_URL }}
+
       - name: Deploy Snowflake Service
         run: |
           snow sql \
@@ -45,17 +61,9 @@ jobs:
             --account $SNOWFLAKE_ACCOUNT \
             --user $SNOWFLAKE_USER \
             --role $SNOWFLAKE_ROLE \
-            --query "ALTER SERVICE demo_db.public.my_service SET SPECIFICATION = $$spec:
-              containers:
-                - name: app
-                  image: ${SNOWFLAKE_REGISTRY_URL}/demo_db/public/my_repo/app:latest
-              endpoints:
-                - name: app
-                  port: 8080
-            $$;"
+            -f deploy.sql
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
           SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
-          SNOWFLAKE_REGISTRY_URL: ${{ secrets.SNOWFLAKE_REGISTRY_URL }}
